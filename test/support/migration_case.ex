@@ -11,13 +11,12 @@ defmodule BlitzMigration.MigrationCase do
   using raw_opts do
     quote do
       import Ecto.Query
-      import BlitzMigration.MigrationCase, only: [start_repo: 2, with_repo: 2, compile_migrations: 1, get_migration_module: 2]
+      import BlitzMigration.MigrationCase, only: [with_repo: 2, compile_migrations: 1, get_migration_module: 2]
 
       @moduletag :migration
 
       opts = unquote(raw_opts)
       @repos Keyword.fetch!(opts, :repos)
-      @otp_app Keyword.get(opts, :otp_app, :blitz_pg)
       @clean_up? Keyword.get(opts, :clean_up?, :true)
 
       # Used because we compile the migration files
@@ -30,28 +29,22 @@ defmodule BlitzMigration.MigrationCase do
         # useful when wanting to see migration results from dbms
         if @clean_up? do
           on_exit(fn -> 
-            @repos
-            |> tap(&Enum.each(&1, fn repo -> start_repo(repo, @otp_app) end))
-            |> Enum.each(&with_repo(&1, fn repo -> 
-                Ecto.Migrator.run(repo, :down, all: true) 
-              end))
+            Enum.each(@repos, &start_repo/1)
+            Enum.each(@repos, &rollback_repo/1)
           end)
         end
 
-        Enum.each(@repos, &start_repo(&1, @otp_app))
+        Enum.each(@repos, & &1.start_link/0)
       end
 
       def get_migrations(modules) do
         migrations = Enum.flat_map(@repos, &compile_migrations/1)
         Enum.map(modules, &get_migration_module(migrations, &1))
       end
-    end
-  end
 
-  def start_repo(repo, app) do
-    app
-    |> Application.get_env(repo)
-    |> repo.start_link()
+      defp start_repo(repo), do: repo.start_link()
+      defp rollback_repo(repo), do: with_repo(repo, &Ecto.Migrator.run(&1, :down, all: true))
+    end
   end
 
   def with_repo(repo, fnc) do

@@ -26,7 +26,8 @@ defmodule BlitzMigration.MixProject do
   defp deps do
     [
       {:ecto_sql, "~> 3.10"},
-      {:postgrex, ">= 0.0.0"}
+      {:postgrex, ">= 0.0.0"},
+      {:nimble_options, "~> 1.0"}
     ]
   end
 end
