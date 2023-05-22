@@ -2,6 +2,7 @@ defmodule BlitzMigration.Constraint do
   @opts_definition NimbleOptions.new!([
     not_valid: [
       type: :boolean,
+      default: false,
       doc: "A flag to enable or disable constraint validations on existing rows"
     ],
     check: [

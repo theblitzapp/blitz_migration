@@ -3,16 +3,8 @@ defmodule BlitzMigration do
   Documentation for `BlitzMigration`.
   """
 
-  @doc """
-  Hello world.
+  alias BlitzMigration.{Constraint, Partition}
 
-  ## Examples
-
-      iex> BlitzMigration.hello()
-      :world
-
-  """
-  def hello do
-    :world
-  end
+  def create_partition_constraint(table_name, constraint_name, opts), do:
+    Partition.execute(table_name, &Constraint.create(&1, constraint_name, opts))
 end
