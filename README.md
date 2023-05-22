@@ -42,7 +42,7 @@ defmodule BlitzMigration.Repo.Migrations.PartitionConstraintTest do
 
     flush()
   
-    #create constraints on each partition
+    #create foreign key constraints on each partition
     BlitzMigration.create_partition_constraint(
       :partitions,
       "partition_constraint_fid",
