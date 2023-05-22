@@ -14,9 +14,7 @@ defmodule BlitzMigration.ConstraintTest do
   describe "create/3" do
     test "success: create unique, check and exclude constraints on table" do
       with_repo(Repo, fn repo ->
-        [ConstraintTest] 
-        |> get_migrations()
-        |> then(&Ecto.Migrator.run(repo, &1, :up, all: true))
+        run_migrations(repo, [ConstraintTest], all: true)
 
         repo.insert_all("constraint_test_table", [%{
           field: "unique", 
@@ -52,9 +50,7 @@ defmodule BlitzMigration.ConstraintTest do
 
     test "success: create foreign key constraint on table" do
       with_repo(Repo, fn repo ->
-        [ForeignKeyConstraintTest] 
-        |> get_migrations()
-        |> then(&Ecto.Migrator.run(repo, &1, :up, all: true))
+        run_migrations(repo, [ForeignKeyConstraintTest], all: true)
 
         repo.insert_all("foreign_table", [%{
           field: "field",

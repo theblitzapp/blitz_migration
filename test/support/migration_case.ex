@@ -11,9 +11,13 @@ defmodule BlitzMigration.MigrationCase do
   using raw_opts do
     quote do
       import Ecto.Query
-      import BlitzMigration.MigrationCase, only: [with_repo: 2, compile_migrations: 1, get_migration_module: 2]
-
-      @moduletag :migration
+      import BlitzMigration.MigrationCase, only: [
+        compile_migrations: 1, 
+        get_migration_module: 2,
+        rollback_repo: 1,
+        start_repo: 1,
+        with_repo: 2
+      ]
 
       opts = unquote(raw_opts)
       @repos Keyword.fetch!(opts, :repos)
@@ -36,16 +40,22 @@ defmodule BlitzMigration.MigrationCase do
 
         Enum.each(@repos, & &1.start_link/0)
       end
+      
+      defp run_migrations(repo, modules, opts \\ []) do
+        modules
+        |> get_migrations()
+        |> then(&Ecto.Migrator.run(repo, &1, :up, opts))
+      end
 
-      def get_migrations(modules) do
+      defp get_migrations(modules) do
         migrations = Enum.flat_map(@repos, &compile_migrations/1)
         Enum.map(modules, &get_migration_module(migrations, &1))
       end
-
-      defp start_repo(repo), do: repo.start_link()
-      defp rollback_repo(repo), do: with_repo(repo, &Ecto.Migrator.run(&1, :down, all: true))
     end
   end
+      
+  def start_repo(repo), do: repo.start_link()
+  def rollback_repo(repo), do: with_repo(repo, &Ecto.Migrator.run(&1, :down, all: true))
 
   def with_repo(repo, fnc) do
     Ecto.Migrator.with_repo(repo, fnc)
