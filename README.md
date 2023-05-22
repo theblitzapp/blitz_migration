@@ -18,10 +18,12 @@ defmodule BlitzMigration.Repo.Migrations.PartitionConstraintTest do
   use Ecto.Migration
 
   def up do
+    #create a table that will be referenced
     create table(:foreign_table) do
       add :field, :string
     end
-
+  
+    #create the parent table for partitions
     create table("partitions", options: "PARTITION BY LIST (key)") do
       add :key, :int, primary_key: true
       add :field, :string
@@ -30,15 +32,17 @@ defmodule BlitzMigration.Repo.Migrations.PartitionConstraintTest do
 
     flush()
 
+  #create partitions with BlitzMigration
     BlitzMigration.Partition.create(
       "partitions", 
       [1, 2, 3], 
-      &"IN (#{&1})", 
-      create_default?: true
+      fn partition_value -> "IN (#{partition_value})" end, #sets the clause for the partition
+      create_default?: true #creates a default partition for when no clauses match
     )
 
     flush()
-
+  
+    #create constraints on each partition
     BlitzMigration.create_partition_constraint(
       :partitions,
       "partition_constraint_fid",
@@ -49,7 +53,8 @@ defmodule BlitzMigration.Repo.Migrations.PartitionConstraintTest do
       ]
     )
   end
-
+  
+  #teardown for the specific scenario
   def down do
     drop table("partitions"), mode: :cascade
     drop table(:foreign_table)
