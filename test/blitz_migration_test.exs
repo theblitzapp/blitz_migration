@@ -1,7 +1,10 @@
 defmodule BlitzMigrationTest do
   
   alias BlitzMigration.{Common, Repo}
-  alias BlitzMigration.Repo.Migrations.PartitionConstraintTest
+  alias BlitzMigration.Repo.Migrations.{
+    PartitionConstraintTest,
+    PartitionIndexTest
+  }
 
   use BlitzMigration.MigrationCase, 
     repos: [Repo]
@@ -28,5 +31,29 @@ defmodule BlitzMigrationTest do
         end
       end)
     end
+  end
+
+  describe "create_partition_index/3" do
+    setup do
+      tables = ~w(
+        game_table 
+        game_table_default 
+        game_table_1
+        game_table_2 
+        game_table_3
+      )
+
+      %{tables: tables} 
+    end
+    test "success: create unique, index on partitions and parent", %{tables: tables} do
+      with_repo(Repo, fn repo ->
+        run_migrations(repo, [PartitionIndexTest], all: true)
+
+        for table <- tables do
+          assert Common.index_exists?(repo, table, "#{table}_season_id_field_idx")
+        end
+      end)
+    end
+    
   end
 end
