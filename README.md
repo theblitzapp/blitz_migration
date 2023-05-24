@@ -66,7 +66,7 @@ function and using it when changes are required to take place.
 
 Another is that although each function provided by `BlitzMigration` is self contained with `:up` and `:down` context awareness, 
 migrations are procedural and in the case of creating a parent table and its partitions in the same migration file, the `:down` will not 
-work because of conflicts.
+work because of conflicts. <- this needs to be further explored
 
 ## Installation
 
