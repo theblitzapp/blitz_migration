@@ -21,5 +21,7 @@ defmodule BlitzMigration.Repo.Migrations.AnalyzeTest do
       skip_locked: true,
       columns: ["number"]
     )
+    
+    Analyze.execute(:analyze_table)
   end
 end

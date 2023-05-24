@@ -16,7 +16,7 @@ defmodule BlitzMigration.Analyze do
     ]
   ])
 
-  def execute(table_name, unchecked_opts) do
+  def execute(table_name, unchecked_opts \\ []) do
     with {:ok, opts} <- NimbleOptions.validate(unchecked_opts, @opts_definition),
          params <- sql_params(opts)
     do
