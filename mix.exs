@@ -8,7 +8,8 @@ defmodule BlitzMigration.MixProject do
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      package: package()
     ]
   end
 
@@ -28,6 +29,15 @@ defmodule BlitzMigration.MixProject do
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
       {:nimble_options, "~> 1.0"}
+    ]
+  end
+
+  defp package do
+    [
+      maintainers: ["Thomas Furland", "theblitzapp"],
+      licenses: ["MIT"],
+      links: %{github: "https://github.com/theblitzapp/blitz_migration"},
+      files: ~w(mix.exs README.md CHANGELOG.md LICENSE lib)
     ]
   end
 end
